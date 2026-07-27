@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TypeFix — Автоматична виправлення раскладки клавіатури для macOS</title>
+  <meta name="description" content="TypeFix — легка нативна утиліта для macOS, яка автоматично виправляє текст, набраний не тією розкладкою клавіатури (English, Українська)." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent-gradient: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 40%);
+      min-height: 100vh;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      border-radius: 30px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #d1d5db 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+    }
+
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      padding: 16px 36px;
+      border-radius: 40px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(96, 165, 250, 0.3);
+      transition: all 0.25s ease;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(168, 85, 247, 0.4);
+    }
+
+    .sub-info {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .demo-wrapper {
+      margin: 50px 0 80px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .demo-wrapper img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .install-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 36px;
+      text-align: left;
+    }
+
+    .install-box h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .install-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-number {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 1rem;
+      color: #e5e7eb;
+      padding-top: 3px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      border-top: 1px solid var(--card-border);
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 2.4rem; }
+      .hero p { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="#" class="brand">
+      <img src="AppIcon.svg" alt="TypeFix Logo" />
+      TypeFix
+    </a>
+  </header>
+
+  <div class="container">
+    <section class="hero">
+      <div class="badge"> macOS 13.0+ Native App</div>
+      <h1>Автоматичне виправлення раскладки клавіатури</h1>
+      <p>
+        Набрали текст не тією мовою? TypeFix миттєво розпізнає помилку, видаляє помилкове слово, перемикає розкладку та вводить правильний текст.
+      </p>
+
+      <div class="cta-group">
+        <a href="TypeFix.dmg" class="btn-download">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Завантажити TypeFix (.dmg)
+        </a>
+        <div class="sub-info">Версія 0.0.5 • Безкоштовно • Без реєстрації</div>
+      </div>
+    </section>
+
+    <div class="demo-wrapper">
+      <img src="TypeFix.gif" alt="TypeFix у дії" />
+    </div>
+
+    <section class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>Автоматичне виправлення</h3>
+        <p>Миттєво виправляє слова при натисканні пробілу або Enter, коли розкладка була вибрана помилково.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⌨️</div>
+        <h3>Режим за гарячою клавішею</h3>
+        <p>Можливість працювати у режимі Hotkey (наприклад Ctrl+Shift+Space), щоб виправляти тільки за вашим викликом.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">↩️</div>
+        <h3>Швидке скасування (Undo)</h3>
+        <p>Натисніть CapsLock або Cmd+Z протягом 5 секунд, щоб миттєво повернути початковий текст.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Розумне фільтрування</h3>
+        <p>Автоматично ігнорує паролі, електронну пошту, посилання, кодувальні терміни та змішані символи.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>Розширений словник</h3>
+        <p>Оновлений словник української мови містить понад 2,9 мільйона слів для максимальної точності.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Автоматичні оновлення</h3>
+        <p>Завдяки підтримці Sparkle додаток самостійно сповістить вас про вихід нових версій.</p>
+      </div>
+    </section>
+
+    <section class="install-box">
+      <h2>Як встановити TypeFix</h2>
+      <div class="install-steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-text">Завантажте та відкрийте файл <strong>TypeFix.dmg</strong>.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-text">Перетягніть <strong>TypeFix.app</strong> у папку <strong>Applications</strong>.</div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-text">Запустіть додаток та надайте дозволи <strong>Accessibility</strong> та <strong>Input Monitoring</strong> під час першого запуску.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>TypeFix © 2026. Усі права захищено. Створено з любов'ю для macOS.</p>
+  </footer>
+
+</body>
+</html>

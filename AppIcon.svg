@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="surface" x1="164" y1="96" x2="846" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6877FF"/>
+      <stop offset="0.46" stop-color="#4356E8"/>
+      <stop offset="1" stop-color="#2634A9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(334 216) rotate(53) scale(638 570)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A5C3FF" stop-opacity=".72"/>
+      <stop offset=".56" stop-color="#8794FF" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#3343BF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="512" y1="90" x2="512" y2="930" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity=".54"/>
+      <stop offset=".38" stop-color="#FFFFFF" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#111B7C" stop-opacity=".28"/>
+    </linearGradient>
+    <linearGradient id="keyTop" x1="355" y1="274" x2="487" y2="556" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9EEFF"/>
+    </linearGradient>
+    <linearGradient id="keyBottom" x1="545" y1="468" x2="679" y2="754" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E8ECFF"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="310" y1="706" x2="732" y2="318" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#54F3C3"/>
+      <stop offset=".52" stop-color="#75F6D1"/>
+      <stop offset="1" stop-color="#C0FFE9"/>
+    </linearGradient>
+    <filter id="keyShadow" x="-40%" y="-35%" width="180%" height="190%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#111B6C" flood-opacity=".34"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#FFFFFF" flood-opacity=".5"/>
+    </filter>
+    <filter id="arrowGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#162373" flood-opacity=".28"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0"/>
+    </filter>
+  </defs>
+
+  <!-- The blue tile is 972×972: exactly 95% of the canvas and optically centered. -->
+  <g transform="translate(512 535.142857) scale(1.157142857) translate(-512 -512)">
+  <!-- macOS app-icon tile -->
+  <g>
+    <rect x="92" y="72" width="840" height="840" rx="196" fill="url(#surface)"/>
+    <rect x="92" y="72" width="840" height="840" rx="196" fill="url(#glow)"/>
+    <rect x="95" y="75" width="834" height="834" rx="193" fill="none" stroke="url(#rim)" stroke-width="6"/>
+  </g>
+
+  <!-- restrained glass highlights -->
+  <path d="M186 196C283 92 430 91 563 98C364 167 234 278 145 442C137 342 141 244 186 196Z"
+        fill="#FFFFFF" opacity=".10"/>
+  <path d="M865 663C816 781 718 853 576 885C699 887 816 869 874 791C901 754 913 710 918 665Z"
+        fill="#111A79" opacity=".16"/>
+
+  <!-- top language key -->
+  <g filter="url(#keyShadow)" transform="rotate(-7 407 403)">
+    <rect x="254" y="249" width="306" height="306" rx="76" fill="url(#keyTop)"/>
+    <rect x="258" y="253" width="298" height="298" rx="72" fill="none" stroke="#FFFFFF" stroke-width="8" opacity=".66"/>
+    <path d="M354 466L405 328C411 311 424 302 440 302C456 302 468 311 475 328L527 466H476L466 435H413L403 466H354ZM424 398H455L440 348L424 398Z"
+          fill="#3444C2"/>
+  </g>
+
+  <!-- lower language key -->
+  <g filter="url(#keyShadow)" transform="rotate(7 617 615)">
+    <rect x="464" y="461" width="306" height="306" rx="76" fill="url(#keyBottom)"/>
+    <rect x="468" y="465" width="298" height="298" rx="72" fill="none" stroke="#FFFFFF" stroke-width="8" opacity=".66"/>
+    <!-- Cyrillic Ф: the same physical key as Latin A on a Ukrainian layout -->
+    <path fill-rule="evenodd"
+          d="M598 492H636V526C691 532 724 564 724 609C724 654 691 686 636 692V722H598V692C543 686 510 654 510 609C510 564 543 532 598 526V492ZM598 564C569 569 555 584 555 609C555 634 569 649 598 654V564ZM636 654C665 649 679 634 679 609C679 584 665 569 636 564V654Z"
+          fill="#3444C2"/>
+  </g>
+
+  <!-- layout-switch gesture -->
+  <g fill="none" stroke="url(#mint)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" filter="url(#arrowGlow)">
+    <path d="M279 674C312 735 370 775 439 783C472 787 503 784 532 774"/>
+    <path d="M494 738L535 774L500 818"/>
+    <path d="M745 340C713 283 660 247 597 238C562 233 530 237 501 248"/>
+    <path d="M537 283L496 248L530 203"/>
+  </g>
+
+  <!-- crisp inner edge for small-size legibility -->
+  <rect x="110" y="90" width="804" height="804" rx="180" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".18"/>
+  </g>
+</svg>
