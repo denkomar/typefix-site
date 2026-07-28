@@ -8,11 +8,11 @@
     <item>
       <title>Version 0.0.7</title>
       <sparkle:releaseNotesLink>https://denkomar.github.io/typefix-site/</sparkle:releaseNotesLink>
-      <pubDate>Tue, 28 Jul 2026 10:10:25 +0000</pubDate>
+      <pubDate>Tue, 28 Jul 2026 10:11:47 +0000</pubDate>
       <enclosure url="https://denkomar.github.io/typefix-site/TypeFix.dmg"
                  sparkle:version="0.0.7"
                  sparkle:shortVersionString="0.0.7"
-                 length="37756257"
+                 length="36848090"
                  type="application/octet-stream" />
     </item>
   </channel>
