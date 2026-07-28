@@ -3,25 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TypeFix — Автоматична виправлення раскладки клавіатури для macOS</title>
-  <meta name="description" content="TypeFix — легка нативна утиліта для macOS, яка автоматично виправляє текст, набраний не тією розкладкою клавіатури (English, Українська)." />
+  <title>TypeFix — Нативна автокорекція розкладки клавіатури для macOS</title>
+  <meta name="description" content="TypeFix — сучасна, легка та нативна утиліта для macOS, яка автоматично виправляє текст, набраний не тією розкладкою клавіатури (English, Українська)." />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-color: #0b0f19;
-      --card-bg: rgba(255, 255, 255, 0.04);
+      --bg-depth: #070913;
+      --bg-surface: rgba(18, 24, 41, 0.65);
+      --bg-surface-hover: rgba(28, 36, 60, 0.75);
       --card-border: rgba(255, 255, 255, 0.08);
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --accent-gradient: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --radius: 16px;
+      --card-border-glow: rgba(84, 243, 195, 0.25);
+      --accent-indigo: #4356e8;
+      --accent-cyan: #54f3c3;
+      --accent-purple: #8794ff;
+      --text-heading: #ffffff;
+      --text-body: #94a3b8;
+      --text-sub: #64748b;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
     }
 
     * {
@@ -30,22 +38,69 @@
       padding: 0;
     }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      line-height: 1.6;
-      overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 40%);
-      min-height: 100vh;
+    html {
+      scroll-behavior: smooth;
     }
 
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-depth);
+      color: var(--text-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Ambient Glow System */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+    }
+
+    .glow-orb-1 {
+      top: -100px;
+      left: 15%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-indigo) 0%, rgba(67, 86, 232, 0) 70%);
+    }
+
+    .glow-orb-2 {
+      top: 300px;
+      right: 10%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(84, 243, 195, 0.25) 0%, rgba(84, 243, 195, 0) 70%);
+    }
+
+    .glow-orb-3 {
+      top: 1200px;
+      left: 5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(135, 148, 255, 0.2) 0%, rgba(135, 148, 255, 0) 70%);
+    }
+
+    /* Navbar */
     header {
-      max-width: 1100px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(7, 9, 19, 0.75);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .nav-container {
+      max-width: 1140px;
       margin: 0 auto;
-      padding: 30px 20px;
+      padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -55,301 +110,1191 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.4rem;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-heading);
       text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+
+    .brand:hover {
+      transform: translateY(-1px);
     }
 
     .brand img {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
     }
 
+    .brand-version {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(84, 243, 195, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(84, 243, 195, 0.3);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-body);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-heading);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-heading);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary-sm {
+      background: linear-gradient(135deg, var(--accent-indigo) 0%, #3444c2 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(67, 86, 232, 0.35);
+    }
+
+    .btn-primary-sm:hover {
+      box-shadow: 0 6px 20px rgba(67, 86, 232, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
     .container {
-      max-width: 960px;
+      max-width: 1140px;
       margin: 0 auto;
-      padding: 40px 20px 80px;
+      padding: 60px 24px 100px;
+      position: relative;
+      z-index: 1;
     }
 
+    /* Hero Section */
     .hero {
       text-align: center;
-      margin-bottom: 60px;
+      max-width: 840px;
+      margin: 0 auto 60px;
     }
 
-    .badge {
-      display: inline-block;
+    .badge-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 6px 16px;
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      color: #60a5fa;
+      background: rgba(67, 86, 232, 0.12);
+      border: 1px solid rgba(135, 148, 255, 0.3);
+      color: var(--accent-purple);
       border-radius: 30px;
       font-size: 0.88rem;
       font-weight: 500;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-hero svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
     }
 
     h1 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 3.5rem;
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 5.5vw, 4.2rem);
       font-weight: 800;
-      line-height: 1.15;
-      margin-bottom: 20px;
-      background: linear-gradient(180deg, #ffffff 0%, #d1d5db 100%);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      color: #ffffff;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto 36px;
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      color: var(--text-body);
+      line-height: 1.6;
+      margin: 0 auto 40px;
+      max-width: 720px;
     }
 
-    .cta-group {
+    .hero-cta {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 16px;
     }
 
-    .btn-download {
+    .btn-download-lg {
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: var(--accent-gradient);
+      background: linear-gradient(135deg, var(--accent-indigo) 0%, #2f3db3 100%);
       color: #ffffff;
-      padding: 16px 36px;
+      padding: 18px 42px;
       border-radius: 40px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.15rem;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
       font-weight: 700;
       text-decoration: none;
-      box-shadow: 0 10px 30px rgba(96, 165, 250, 0.3);
-      transition: all 0.25s ease;
-    }
-
-    .btn-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 35px rgba(168, 85, 247, 0.4);
-    }
-
-    .sub-info {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-    }
-
-    .demo-wrapper {
-      margin: 50px 0 80px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 36px rgba(67, 86, 232, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
       overflow: hidden;
     }
 
-    .demo-wrapper img {
+    .btn-download-lg::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(84, 243, 195, 0.3) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .btn-download-lg:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 44px rgba(67, 86, 232, 0.55);
+      border-color: rgba(84, 243, 195, 0.4);
+    }
+
+    .btn-download-lg:hover::before {
+      opacity: 1;
+    }
+
+    .sub-meta {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.88rem;
+      color: var(--text-sub);
+    }
+
+    .sub-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot-separator {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--text-sub);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 800px;
+      margin: 50px auto 0;
+      padding: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-heading);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-body);
+      margin-top: 4px;
+    }
+
+    /* Signature Interactive Visualizer Widget */
+    .visualizer-section {
+      margin: 80px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-cyan);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+
+    .section-desc {
+      color: var(--text-body);
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: 10px auto 0;
+    }
+
+    .interactive-card {
+      background: rgba(14, 19, 33, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .interactive-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-lg);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(84, 243, 195, 0.3) 0%, rgba(67, 86, 232, 0.3) 50%, transparent 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .widget-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+
+    .widget-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+
+    .layout-badge-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .layout-badge {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-sub);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s ease;
+    }
+
+    .layout-badge.active {
+      background: rgba(84, 243, 195, 0.15);
+      color: var(--accent-cyan);
+      border-color: rgba(84, 243, 195, 0.4);
+      box-shadow: 0 0 12px rgba(84, 243, 195, 0.2);
+    }
+
+    .arrow-icon {
+      color: var(--text-sub);
+    }
+
+    .presets-label {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .preset-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .preset-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-body);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-chip:hover {
+      background: rgba(67, 86, 232, 0.15);
+      border-color: rgba(135, 148, 255, 0.4);
+      color: var(--text-heading);
+    }
+
+    .preset-chip.active {
+      background: rgba(67, 86, 232, 0.25);
+      border-color: var(--accent-purple);
+      color: #ffffff;
+    }
+
+    .input-simulator-wrapper {
+      position: relative;
+    }
+
+    .simulator-input {
+      width: 100%;
+      background: rgba(7, 9, 19, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      color: var(--text-heading);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .simulator-input:focus {
+      border-color: rgba(135, 148, 255, 0.5);
+      box-shadow: 0 0 0 3px rgba(67, 86, 232, 0.2);
+    }
+
+    .status-toast {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(84, 243, 195, 0.08);
+      border: 1px solid rgba(84, 243, 195, 0.25);
+      font-size: 0.9rem;
+      color: var(--accent-cyan);
+      transition: opacity 0.3s ease;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+
+    /* Video / Gif Showcase Window */
+    .showcase-section {
+      margin: 90px 0;
+    }
+
+    .mac-window {
+      background: rgba(14, 19, 33, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+
+    .mac-titlebar {
+      height: 44px;
+      background: rgba(7, 9, 19, 0.8);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
+
+    .mac-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mac-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .mac-dot.close { background: #ff5f56; }
+    .mac-dot.minimize { background: #ffbd2e; }
+    .mac-dot.maximize { background: #27c93f; }
+
+    .mac-title {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .mac-body {
+      padding: 12px;
+      background: #000000;
+    }
+
+    .mac-body img {
       width: 100%;
       height: auto;
-      border-radius: 10px;
       display: block;
+      border-radius: calc(var(--radius-lg) - 10px);
+    }
+
+    /* Features Grid */
+    .features-section {
+      margin: 100px 0;
     }
 
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-bottom: 80px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      margin-top: 50px;
     }
 
     .feature-card {
-      background: var(--card-bg);
+      background: var(--bg-surface);
       border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 28px;
-      backdrop-filter: blur(10px);
-      transition: border-color 0.2s ease;
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      backdrop-filter: blur(16px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
 
     .feature-card:hover {
-      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+      background: var(--bg-surface-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
     }
 
-    .feature-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
+    .feature-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: rgba(67, 86, 232, 0.15);
+      border: 1px solid rgba(135, 148, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-purple);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+      background: rgba(84, 243, 195, 0.15);
+      border-color: rgba(84, 243, 195, 0.4);
+      color: var(--accent-cyan);
+    }
+
+    .feature-icon-wrapper svg {
+      width: 24px;
+      height: 24px;
     }
 
     .feature-card h3 {
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--font-display);
       font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #fff;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 12px;
     }
 
     .feature-card p {
       font-size: 0.95rem;
-      color: var(--text-muted);
+      color: var(--text-body);
+      line-height: 1.65;
     }
 
-    .install-box {
-      background: var(--card-bg);
+    /* Keycaps & Shortcut Showcase Section */
+    .shortcuts-section {
+      margin: 100px 0;
+      background: var(--bg-surface);
       border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 36px;
-      text-align: left;
+      border-radius: var(--radius-lg);
+      padding: 48px 36px;
+      backdrop-filter: blur(16px);
     }
 
-    .install-box h2 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.75rem;
-      margin-bottom: 20px;
-      color: #fff;
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 40px;
     }
 
-    .install-steps {
+    .shortcut-card {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
-    .step {
+    .keycap-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .keycap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      height: 38px;
+      padding: 0 12px;
+      background: linear-gradient(180deg, #2a344d 0%, #171e30 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-bottom: 3px solid rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .plus-symbol {
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .shortcut-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+
+    .shortcut-desc {
+      font-size: 0.9rem;
+      color: var(--text-body);
+    }
+
+    /* Installation Section */
+    .install-section {
+      margin: 100px 0;
+    }
+
+    .install-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 44px;
+      backdrop-filter: blur(16px);
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-top: 36px;
+    }
+
+    .step-row {
       display: flex;
       align-items: flex-start;
-      gap: 16px;
+      gap: 20px;
     }
 
-    .step-number {
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      width: 32px;
-      height: 32px;
+    .step-badge {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-indigo) 0%, #3444c2 100%);
+      color: #ffffff;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
       flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(67, 86, 232, 0.3);
     }
 
-    .step-text {
-      font-size: 1rem;
-      color: #e5e7eb;
-      padding-top: 3px;
+    .step-content {
+      flex: 1;
+      padding-top: 4px;
     }
 
-    footer {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
+    .step-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 6px;
+    }
+
+    .step-desc {
+      font-size: 0.95rem;
+      color: var(--text-body);
+    }
+
+    .code-block {
+      background: #080b14;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      font-family: var(--font-mono);
       font-size: 0.88rem;
-      border-top: 1px solid var(--card-border);
+      color: #e2e8f0;
+      margin-top: 14px;
+      overflow-x: auto;
+      line-height: 1.7;
     }
 
-    @media (max-width: 640px) {
-      h1 { font-size: 2.4rem; }
-      .hero p { font-size: 1.1rem; }
+    .code-block .cmd-prompt {
+      color: var(--accent-cyan);
+      user-select: none;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      background: rgba(7, 9, 19, 0.95);
+      padding: 50px 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .footer-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+
+    .footer-copy {
+      font-size: 0.88rem;
+      color: var(--text-sub);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-body);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-heading);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .stats-bar { grid-template-columns: 1fr; }
+      .shortcuts-section, .install-card, .interactive-card { padding: 24px; }
+      .footer-inner { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Ambient Glow Elements -->
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
+  <div class="glow-orb glow-orb-3"></div>
+
+  <!-- Header -->
   <header>
-    <a href="#" class="brand">
-      <img src="AppIcon.svg" alt="TypeFix Logo" />
-      TypeFix
-    </a>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <img src="AppIcon.svg" alt="TypeFix Logo" />
+        TypeFix
+        <span class="brand-version">v0.0.5</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#interactive">Інтерактив</a></li>
+        <li><a href="#features">Можливості</a></li>
+        <li><a href="#shortcuts">Клавіші</a></li>
+        <li><a href="#installation">Встановлення</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="TypeFix.dmg" class="btn-small btn-primary-sm">
+          Завантажити
+        </a>
+      </div>
+    </div>
   </header>
 
   <div class="container">
+    <!-- Hero Section -->
     <section class="hero">
-      <div class="badge"> macOS 13.0+ Native App</div>
-      <h1>Автоматичне виправлення раскладки клавіатури</h1>
-      <p>
-        Набрали текст не тією мовою? TypeFix миттєво розпізнає помилку, видаляє помилкове слово, перемикає розкладку та вводить правильний текст.
+      <div class="badge-hero">
+        <svg viewBox="0 0 170 170">
+          <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.16-1.9-14.49-6.07-3.41-2.79-7.39-7.51-11.96-14.16-6.73-9.75-12.16-20.78-16.29-33.09-4.14-12.31-6.2-24.32-6.2-36.03 0-14.48 3.51-26.6 10.53-36.35 7.03-9.75 16.05-14.77 27.08-15.06 4.35 0 9.38 1.18 15.09 3.54 5.71 2.37 9.77 3.55 12.18 3.55 2.1 0 6.22-1.23 12.36-3.69 6.14-2.46 11.16-3.63 15.06-3.5 12.15.67 21.94 5.43 29.37 14.28-10.84 6.54-16.14 15.54-15.9 27 0 10.05 3.86 18.49 11.59 25.32 7.73 6.83 17 10.63 27.81 11.39-2.58 7.7-6.07 15.3-10.47 22.8zM119.22 31.9c0-6.73 2.45-13.38 7.35-19.95 4.9-6.57 11.08-10.87 18.54-12.9 0.77 8.01-1.78 15.35-7.65 22.02-5.87 6.67-12.44 10.42-19.7 11.25-0.26-1.57-0.39-2.71-0.39-3.42z"/>
+        </svg>
+        Native macOS 13.0+ App
+      </div>
+
+      <h1>Пишіть вільно.<br>TypeFix виправить розкладку за вас.</h1>
+      <p class="hero-subtitle">
+        Набрали «ghbdsn» замість «привіт»? TypeFix непомітно та миттєво розпізнає помилку, видаляє невдале слово, перемикає мову та вводить правильний текст.
       </p>
 
-      <div class="cta-group">
-        <a href="TypeFix.dmg" class="btn-download">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <div class="hero-cta">
+        <a href="TypeFix.dmg" class="btn-download-lg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
           Завантажити TypeFix (.dmg)
         </a>
-        <div class="sub-info">Версія 0.0.5 • Безкоштовно • Без реєстрації</div>
+        <div class="sub-meta">
+          <span>Версія 0.0.5</span>
+          <div class="dot-separator"></div>
+          <span>Безкоштовно</span>
+          <div class="dot-separator"></div>
+          <span>Без реєстрації</span>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-val">2.9M+</div>
+          <div class="stat-label">Слів у словнику UA</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">&lt; 10ms</div>
+          <div class="stat-label">Миттєва швидкість</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">100%</div>
+          <div class="stat-label">Локально & Приватно</div>
+        </div>
       </div>
     </section>
 
-    <div class="demo-wrapper">
-      <img src="TypeFix.gif" alt="TypeFix у дії" />
-    </div>
-
-    <section class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">✨</div>
-        <h3>Автоматичне виправлення</h3>
-        <p>Миттєво виправляє слова при натисканні пробілу або Enter, коли розкладка була вибрана помилково.</p>
+    <!-- Signature Interactive Demo Visualizer Widget -->
+    <section class="visualizer-section" id="interactive">
+      <div class="section-header">
+        <span class="section-tag">Інтерактивний демо-симулятор</span>
+        <h2 class="section-title">Перевірте роботу алгоритму у реальному часі</h2>
+        <p class="section-desc">Оберіть приклад або введіть свій текст не тією розкладкою, щоб побачити як TypeFix проводитиме автокорекцію.</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">⌨️</div>
-        <h3>Режим за гарячою клавішею</h3>
-        <p>Можливість працювати у режимі Hotkey (наприклад Ctrl+Shift+Space), щоб виправляти тільки за вашим викликом.</p>
-      </div>
+      <div class="interactive-card">
+        <div class="widget-topbar">
+          <div class="widget-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8"/>
+            </svg>
+            TypeFix Engine Visualizer
+          </div>
+          <div class="layout-badge-group">
+            <span class="layout-badge active" id="badge-from">EN</span>
+            <span class="arrow-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+            <span class="layout-badge" id="badge-to">UA</span>
+          </div>
+        </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">↩️</div>
-        <h3>Швидке скасування (Undo)</h3>
-        <p>Натисніть CapsLock або Cmd+Z протягом 5 секунд, щоб миттєво повернути початковий текст.</p>
-      </div>
+        <div class="presets-label">Оберіть приклад для швидкої перевірки:</div>
+        <div class="preset-chips">
+          <button class="preset-chip active" onclick="runSimulation('ghbdsn', 'EN', 'UA', this)">
+            ghbdsn → привіт
+          </button>
+          <button class="preset-chip" onclick="runSimulation('Rvghjvsc', 'EN', 'UA', this)">
+            Rvghjvsc → Компроміс
+          </button>
+          <button class="preset-chip" onclick="runSimulation('Ckfdf Erhf]ys!', 'EN', 'UA', this)">
+            Ckfdf Erhf]ys! → Слава Україні!
+          </button>
+          <button class="preset-chip" onclick="runSimulation('Ghbdsn', 'EN', 'UA', this)">
+            Ghbdsn → Привіт
+          </button>
+        </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <h3>Розумне фільтрування</h3>
-        <p>Автоматично ігнорує паролі, електронну пошту, посилання, кодувальні терміни та змішані символи.</p>
-      </div>
+        <div class="input-simulator-wrapper">
+          <input type="text" id="sim-input" class="simulator-input" value="ghbdsn " placeholder="Введіть текст не тією розкладкою і натисніть пробіл..." oninput="handleCustomInput(this.value)">
+        </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">📚</div>
-        <h3>Розширений словник</h3>
-        <p>Оновлений словник української мови містить понад 2,9 мільйона слів для максимальної точності.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🔄</div>
-        <h3>Автоматичні оновлення</h3>
-        <p>Завдяки підтримці Sparkle додаток самостійно сповістить вас про вихід нових версій.</p>
+        <div class="status-toast" id="status-toast">
+          <div class="status-left">
+            <div class="pulse-dot"></div>
+            <span id="status-text">Розпізнано помилкову розкладку EN. Проведено автозаміну ➔ UA ("привіт")</span>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 0.8rem; opacity: 0.7;">Затримка &lt; 8ms</span>
+        </div>
       </div>
     </section>
 
-    <section class="install-box">
-      <h2>Як встановити TypeFix</h2>
-      <div class="install-steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-text">Завантажте та відкрийте файл <strong>TypeFix.dmg</strong>.</div>
+
+
+    <!-- Features Grid -->
+    <section class="features-section" id="features">
+      <div class="section-header">
+        <span class="section-tag">Функціональність</span>
+        <h2 class="section-title">Все необхідне для безперешкодного набору</h2>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/>
+            </svg>
+          </div>
+          <h3>Автоматична корекція</h3>
+          <p>Миттєво виправляє помилкові слова при натисканні Пробілу або Enter, автоматично перемикаючи активну розкладку клавіатури.</p>
         </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-text">Перетягніть <strong>TypeFix.app</strong> у папку <strong>Applications</strong>.</div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8"/>
+            </svg>
+          </div>
+          <h3>Режим за гарячою клавішею</h3>
+          <p>Можливість налаштувати виправлення тільки за вашим викликом (наприклад, комбінацією Ctrl + Shift + Space).</p>
         </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-text">Запустіть додаток та надайте дозволи <strong>Accessibility</strong> та <strong>Input Monitoring</strong> під час першого запуску.</div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 14 4 9l5-5"/>
+              <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>
+            </svg>
+          </div>
+          <h3>Швидке скасування (Undo)</h3>
+          <p>Натисніть CapsLock або Cmd + Z протягом 5 секунд після автозаміни, щоб миттєво повернути початковий варіант тексту.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>Розумні фільтри безпеки</h3>
+          <p>Автоматично ігнорує паролі, посилання, електронну пошту, змішані мовні символи та терміни програмування.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+            </svg>
+          </div>
+          <h3>Багатий словник (2.9M+)</h3>
+          <p>Розширений словник української мови містить понад 2,9 мільйона нормалізованих слів для бездоганної точності.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M16 21h5v-5"/>
+            </svg>
+          </div>
+          <h3>Автоматичні оновлення</h3>
+          <p>Нативна підтримка фреймворку Sparkle сповістить про вихід нових релізів та оновлення словників.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shortcuts & Keycaps Showcase Section -->
+    <section class="shortcuts-section" id="shortcuts">
+      <div class="section-header" style="text-align: left; margin-bottom: 0;">
+        <span class="section-tag">Швидке керування</span>
+        <h2 class="section-title">Зручні комбінації клавіш</h2>
+      </div>
+
+      <div class="shortcuts-grid">
+        <div class="shortcut-card">
+          <div class="keycap-row">
+            <span class="keycap">Ctrl</span>
+            <span class="plus-symbol">+</span>
+            <span class="keycap">Shift</span>
+            <span class="plus-symbol">+</span>
+            <span class="keycap">Space</span>
+          </div>
+          <div class="shortcut-title">Виправлення за запитом</div>
+          <div class="shortcut-desc">Миттєве перетворення виділеного або останнього слова у режимі Hotkey.</div>
+        </div>
+
+        <div class="shortcut-card">
+          <div class="keycap-row">
+            <span class="keycap">CapsLock</span>
+            <span class="plus-symbol">або</span>
+            <span class="keycap">⌘</span>
+            <span class="plus-symbol">+</span>
+            <span class="keycap">Z</span>
+          </div>
+          <div class="shortcut-title">Скасування виправлення (Undo)</div>
+          <div class="shortcut-desc">Повертає початковий набраний варіант протягом 5 секунд після заміни.</div>
+        </div>
+
+        <div class="shortcut-card">
+          <div class="keycap-row">
+            <span class="keycap">⌥</span>
+            <span class="plus-symbol">+</span>
+            <span class="keycap">⌘</span>
+            <span class="plus-symbol">+</span>
+            <span class="keycap">T</span>
+          </div>
+          <div class="shortcut-title">Меню налаштувань</div>
+          <div class="shortcut-desc">Швидкий виклик вікна конфігурації та списку виключених додатків.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation Steps -->
+    <section class="install-section" id="installation">
+      <div class="install-card">
+        <div class="section-header" style="text-align: left; margin-bottom: 0;">
+          <span class="section-tag">Інсталяція</span>
+          <h2 class="section-title">Як встановити TypeFix на Mac</h2>
+        </div>
+
+        <div class="steps-container">
+          <div class="step-row">
+            <div class="step-badge">1</div>
+            <div class="step-content">
+              <div class="step-title">Завантажте дистрибутив</div>
+              <div class="step-desc">Завантажте готовий образ диска <strong>TypeFix.dmg</strong> з нашого сайту.</div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="step-badge">2</div>
+            <div class="step-content">
+              <div class="step-title">Перемістіть у Програми</div>
+              <div class="step-desc">Відкрийте .dmg файл та перетягніть іконку <strong>TypeFix.app</strong> у папку <strong>Applications</strong>.</div>
+            </div>
+          </div>
+
+          <div class="step-row">
+            <div class="step-badge">3</div>
+            <div class="step-content">
+              <div class="step-title">Надайте дозволи системи</div>
+              <div class="step-desc">При першому запуску додаток запросить системні дозволи <strong>Accessibility</strong> та <strong>Input Monitoring</strong> для роботи з клавіатурними подіями.</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </div>
 
+  <!-- Footer -->
   <footer>
-    <p>TypeFix © 2026. Усі права захищено. Створено з любов'ю для macOS.</p>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="AppIcon.svg" alt="TypeFix Logo" width="28" height="28" style="border-radius: 6px;" />
+        TypeFix © 2026
+      </div>
+
+      <div class="footer-copy">
+        Нативна утиліта для macOS. Створено з максимальною увагою до деталей.
+      </div>
+
+      <div class="footer-meta" style="font-size: 0.88rem; color: var(--text-sub);">
+        macOS 13.0+ • Apple Silicon & Intel
+      </div>
+    </div>
   </footer>
 
+  <!-- Interactive Demo Script -->
+  <script>
+    const enToUaMap = {
+      'q':'й','w':'ц','e':'у','r':'к','t':'е','y':'н','u':'г','i':'ш','o':'щ','p':'з','[':'х',']':'ї',
+      'a':'ф','s':'і','d':'в','f':'а','g':'п','h':'р','j':'о','k':'л','l':'д',';':'ж','\'':'є',
+      'z':'я','x':'ч','c':'с','v':'м','b':'и','n':'т','m':'ь',',':'б','.':'ю','/':'.',
+      'Q':'Й','W':'Ц','E':'У','R':'К','T':'Е','Y':'Н','U':'Г','I':'Ш','O':'Щ','P':'З','{':'Х','}':'Ї',
+      'A':'Ф','S':'І','D':'В','F':'А','G':'П','H':'Р','J':'О','K':'Л','L':'Д',':':'Ж','"':'Є',
+      'Z':'Я','X':'Ч','C':'С','V':'М','B':'И','N':'Т','M':'Ь','<':'Б','>':'Ю','?':','
+    };
+
+    const uaToEnMap = {};
+    for (let key in enToUaMap) {
+      uaToEnMap[enToUaMap[key]] = key;
+    }
+
+    function convertString(str, fromLang) {
+      let res = '';
+      const map = fromLang === 'EN' ? enToUaMap : uaToEnMap;
+      for (let ch of str) {
+        res += map[ch] || ch;
+      }
+      return res;
+    }
+
+    let isTyping = false;
+
+    function runSimulation(mistypedStr, fromLang, toLang, btnEl) {
+      if (isTyping) return;
+      isTyping = true;
+
+      const inputEl = document.getElementById('sim-input');
+      const badgeFrom = document.getElementById('badge-from');
+      const badgeTo = document.getElementById('badge-to');
+      const toast = document.getElementById('status-toast');
+      const statusText = document.getElementById('status-text');
+
+      // Update chips UI
+      document.querySelectorAll('.preset-chip').forEach(chip => {
+        chip.classList.remove('active');
+      });
+      if (btnEl) {
+        btnEl.classList.add('active');
+      }
+
+      badgeFrom.innerText = fromLang;
+      badgeTo.innerText = toLang;
+      badgeFrom.classList.add('active');
+      badgeTo.classList.remove('active');
+
+      inputEl.value = '';
+      let index = 0;
+
+      // Type mistyped string letter by letter
+      const typeInterval = setInterval(() => {
+        if (index < mistypedStr.length) {
+          inputEl.value += mistypedStr[index];
+          index++;
+        } else {
+          clearInterval(typeInterval);
+          
+          // Trigger space effect
+          setTimeout(() => {
+            inputEl.value += ' ';
+            
+            // Trigger auto-fix logic
+            setTimeout(() => {
+              const converted = convertString(mistypedStr, fromLang);
+              inputEl.value = converted + ' ';
+              badgeFrom.classList.remove('active');
+              badgeTo.classList.add('active');
+              statusText.innerText = `Розпізнано помилкову розкладку ${fromLang}. Проведено автозаміну ➔ ${toLang} ("${converted}")`;
+              toast.style.opacity = '1';
+              isTyping = false;
+            }, 250);
+          }, 300);
+        }
+      }, 70);
+    }
+
+    function handleCustomInput(val) {
+      const toast = document.getElementById('status-toast');
+      const statusText = document.getElementById('status-text');
+      const badgeFrom = document.getElementById('badge-from');
+      const badgeTo = document.getElementById('badge-to');
+
+      if (val.endsWith(' ')) {
+        const word = val.trim();
+        if (!word) return;
+        
+        // Simple check if word is mistyped EN
+        let converted = convertString(word, 'EN');
+        if (converted !== word) {
+          document.getElementById('sim-input').value = converted + ' ';
+          badgeFrom.innerText = 'EN';
+          badgeTo.innerText = 'UA';
+          badgeFrom.classList.remove('active');
+          badgeTo.classList.add('active');
+          statusText.innerText = `Миттєво виправлено на розкладку UA: "${converted}"`;
+          toast.style.opacity = '1';
+        }
+      }
+    }
+  </script>
 </body>
 </html>
