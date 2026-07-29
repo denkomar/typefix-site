@@ -6,12 +6,12 @@
     <description>Most recent updates to TypeFix</description>
     <language>uk</language>
     <item>
-      <title>Version 0.0.8</title>
+      <title>Version 0.1.0</title>
       <sparkle:releaseNotesLink>https://denkomar.github.io/typefix-site/</sparkle:releaseNotesLink>
-      <pubDate>Tue, 28 Jul 2026 13:47:04 +0000</pubDate>
+      <pubDate>Wed, 29 Jul 2026 15:41:51 +0000</pubDate>
       <enclosure url="https://denkomar.github.io/typefix-site/TypeFix.dmg"
-                 sparkle:version="0.0.8"
-                 sparkle:shortVersionString="0.0.8"
+                 sparkle:version="0.1.0"
+                 sparkle:shortVersionString="0.1.0"
                  length="37761959"
                  type="application/octet-stream" />
     </item>
